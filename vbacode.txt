@@ -1,0 +1,114 @@
+Sub stock()
+Dim ws As Worksheet
+Dim Ticker As String
+Dim TableRow As Integer
+Dim Volume As LongLong
+Dim OpenP As Double
+Dim CloseP As Double
+Dim QuartChange As Double
+Dim PercentChange As Double
+Dim GreatestIncrease As Double
+Dim GreatestDecrease As Double
+Dim VolumeNum As Double
+
+
+
+
+For Each ws In Worksheets
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Quarterly Change"
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+ws.Cells(1, 16).Value = "Ticker"
+ws.Cells(1, 17).Value = "Value"
+ws.Cells(2, 15).Value = " Greatest % Increase"
+ws.Cells(3, 15).Value = "Greatest % Decrease"
+ws.Cells(4, 15).Value = "Greatest Total Volume"
+
+lastrow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+TableRow = 2
+Volume = 0
+OpenP = ws.Cells(TableRow, 3).Value
+
+
+    For i = 2 To lastrow
+    
+        If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+        Ticker = ws.Cells(i, 1).Value
+        Volume = Volume + ws.Cells(i, 7).Value
+        CloseP = ws.Cells(i, 6).Value
+        QuartChange = (CloseP - OpenP)
+        
+        
+        ws.Range("I" & TableRow).Value = Ticker
+        ws.Range("L" & TableRow).Value = Volume
+        ws.Range("J" & TableRow).Value = QuartChange
+        
+            If (OpenP = 0) Then
+                PercentChange = 0
+                Else
+                PercentChange = QuartChange / OpenP
+            End If
+        
+        ws.Range("K" & TableRow).Value = PercentChange
+        ws.Range("K" & TableRow).NumberFormat = "0.00%"
+        
+        
+             
+                
+        TableRow = TableRow + 1
+        Volume = 0
+        OpenP = ws.Cells(i + 1, 3)
+        
+        
+        Else
+        Volume = Volume + ws.Cells(i, 7).Value
+        
+        End If
+        
+        
+    Next i
+    
+    last_row = ws.Cells(ws.Rows.Count, 11).End(xlUp).Row
+    
+    For i = 2 To last_row
+            If ws.Cells(i, 11).Value > 0 Then
+                ws.Cells(i, 10).Interior.ColorIndex = 4
+                   
+            Else
+                ws.Cells(i, 10).Interior.ColorIndex = 3
+            End If
+     Next i
+            
+     last_row1 = ws.Cells(ws.Rows.Count, 12).End(xlUp).Row
+     For i = 2 To last_row1
+        
+        
+       
+     
+            
+    Next i
+    
+    
+    last_row2 = ws.Cells(ws.Rows.Count, 11).End(xlUp).Row
+    last_row3 = ws.Cells(ws.Rows.Count, 12).End(xlUp).Row
+    
+    Range("Q2") = "%" & WorksheetFunction.Max(Range("K2:K" & last_row2)) * 100
+    Range("Q3") = "%" & WorksheetFunction.Min(Range("K2:K" & last_row2)) * 100
+    Range("Q4") = WorksheetFunction.Max(Range("L2:L" & last_row3))
+    
+    GreatestIncrease = WorksheetFunction.Match(WorksheetFunction.Max(Range("K2:K" & last_row2)), Range("K2:K" & last_row2), 0)
+    GreatestDecrease = WorksheetFunction.Match(WorksheetFunction.Min(Range("K2:K" & last_row2)), Range("K2:K" & last_row2), 0)
+    VolumeNum = WorksheetFunction.Match(WorksheetFunction.Max(Range("L2:L" & last_row3)), Range("L2:L" & last_row3), 0)
+    
+    Range("P2") = ws.Cells(GreatestIncrease + 1, 9)
+    Range("P3") = ws.Cells(GreatestDecrease + 1, 9)
+    Range("P4") = ws.Cells(VolumeNum + 1, 9)
+    
+    
+    
+
+
+Next ws
+
+End Sub
